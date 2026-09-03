@@ -374,9 +374,9 @@
           <use href="#bush" x="30" y="240"/>
         </g>
 
-        <path d="M70,500 C150,480 200,460 260,430 C220,400 150,330 180,280 C220,240 300,260 380,230 C450,210 520,260 560,340 C610,300 660,200 700,140"
+        <path d="M70,500 C150,480 200,460 260,430 C220,400 150,330 180,280 C210,250 260,210 300,190 C340,220 390,225 420,220 C480,220 530,270 560,340 C610,300 660,200 700,140"
               fill="none" stroke="#8A7B5C" stroke-width="16" stroke-linecap="round"/>
-        <path d="M70,500 C150,480 200,460 260,430 C220,400 150,330 180,280 C220,240 300,260 380,230 C450,210 520,260 560,340 C610,300 660,200 700,140"
+        <path d="M70,500 C150,480 200,460 260,430 C220,400 150,330 180,280 C210,250 260,210 300,190 C340,220 390,225 420,220 C480,220 530,270 560,340 C610,300 660,200 700,140"
               fill="none" stroke="#F6EFDC" stroke-width="3" stroke-linecap="round" stroke-dasharray="3 14"/>
 
         <g id="alts"></g>
@@ -387,6 +387,7 @@
       <span><i class="dot" style="background:#9B9284"></i>Perjalanan</span>
       <span><i class="dot" style="background:#E86A45"></i>Kuliner</span>
       <span><i class="dot" style="background:#6FA66C"></i>Wisata</span>
+      <span><i class="dot" style="background:#8B6FB3"></i>Ibadah</span>
       <span><i class="dot" style="background:#E8A33D"></i>Rekreasi</span>
       <span><i class="dot" style="background:#3E92CC"></i>Penginapan</span>
       <span><i class="dot-small"></i>Opsi alternatif</span>
@@ -403,6 +404,7 @@ const CATEGORY_COLOR = {
   transit: '#9B9284',
   kuliner: '#E86A45',
   wisata: '#6FA66C',
+  ibadah: '#8B6FB3',
   rekreasi: '#E8A33D',
   penginapan: '#3E92CC'
 };
@@ -410,6 +412,7 @@ const CATEGORY_LABEL = {
   transit: 'Perjalanan',
   kuliner: 'Kuliner',
   wisata: 'Wisata & Edukasi',
+  ibadah: 'Ibadah',
   rekreasi: 'Rekreasi',
   penginapan: 'Penginapan'
 };
@@ -438,21 +441,29 @@ const stops = [
     done: false
   },
   {
-    id: 4, x: 380, y: 230, emoji: '🍛', name: 'Makan Siang: Ayam Bebek Kari Pedas Darmawangsa',
+    id: 4, x: 300, y: 190, emoji: '🕌', name: 'Sholat Jumat',
+    category: 'ibadah', hours: '11:45–13:00 (perkiraan waktu sholat Jumat)',
+    price: '—',
+    note: 'Pilihan masjid di jalur: Al-Mi\'raj Grand Mosque (Jl. Raya Pajajaran, dekat pintu keluar arah Ciawi) atau Mushola Kebun Raya (di dalam Kebun Raya, lebih deket dari Museum Zoologi tapi lebih kecil & bisa penuh weekend).',
+    alts: ["Al-Mi'raj Grand Mosque", 'Mushola Kebun Raya'],
+    done: false
+  },
+  {
+    id: 5, x: 420, y: 220, emoji: '🍛', name: 'Makan Siang: Ayam Bebek Kari Pedas Darmawangsa',
     category: 'kuliner', hours: 'Buka 24 jam',
     price: 'Harga kaki lima, kisaran Rp20rb–40rb/porsi',
     note: 'Jl. DR. Sumeru No.68, Menteng, Bogor Barat — sekitar 3-5 km dari Surken, dekat saja.',
     done: false
   },
   {
-    id: 5, x: 560, y: 340, emoji: '🏰', name: "Nicole's River Park",
+    id: 6, x: 560, y: 340, emoji: '🏰', name: "Nicole's River Park",
     category: 'rekreasi', hours: '08:00–17:00 (jam bisa lebih panjang saat weekend, cek dulu)',
     price: 'Masuk Rp35rb (weekday)/Rp40rb (weekend). Paket + Castle mulai Rp65rb–165rb',
     note: 'Ada mini zoo, wahana anak, dan banyak spot foto ala negeri dongeng. Cocok buat anak-anak.',
     done: false
   },
   {
-    id: 6, x: 700, y: 140, emoji: '🏡', name: 'Penginapan di Megamendung',
+    id: 7, x: 700, y: 140, emoji: '🏡', name: 'Penginapan di Megamendung',
     category: 'penginapan', hours: 'Usahakan check-in sebelum 17:30',
     price: '—',
     note: 'Jalur Puncak mulai nanjak & berkelok, banyak truk/bus lambat — pelan-pelan aja.',
