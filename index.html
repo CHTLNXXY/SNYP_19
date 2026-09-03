@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perjalanan SNYP di Bogor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6EFDC;
+    --paper-dark:#EDE2C4;
+    --ink:#2B2115;
+    --forest:#2F5233;
+    --forest-light:#4A7350;
+    --mustard:#E8A33D;
+    --coral:#E86A45;
+    --leaf:#6FA66C;
+    --sky:#3E92CC;
+    --grey:#9B9284;
+    --white:#FFFDF7;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(111,166,108,0.10) 0, transparent 45%),
+      radial-gradient(circle at 85% 80%, rgba(232,163,61,0.12) 0, transparent 45%),
+      var(--paper);
+    font-family:'Nunito', sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    padding:18px 14px 40px;
+  }
+  .wrap{max-width:640px; margin:0 auto;}
+  header{text-align:center; margin-bottom:18px;}
+  header h1{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:800;
+    font-size:1.7rem;
+    color:var(--forest);
+    margin:0 0 4px;
+    letter-spacing:0.2px;
+  }
+  header p{margin:0; font-size:0.92rem; color:#5B4F3C; font-weight:600;}
+
+  .tabs{
+    display:flex;
+    gap:8px;
+    margin:20px 0 16px;
+    background:var(--paper-dark);
+    padding:6px;
+    border-radius:16px;
+  }
+  .tab-btn{
+    flex:1;
+    border:none;
+    background:transparent;
+    font-family:'Baloo 2', sans-serif;
+    font-size:1rem;
+    font-weight:700;
+    color:#6B5D45;
+    padding:10px 8px;
+    border-radius:12px;
+    cursor:pointer;
+    transition:background .18s ease, color .18s ease, transform .12s ease;
+  }
+  .tab-btn.active{
+    background:var(--forest);
+    color:var(--white);
+    box-shadow:0 3px 0 rgba(0,0,0,0.12);
+  }
+  .tab-btn:not(.active):hover{background:rgba(255,255,255,0.6);}
+  .tab-btn:active{transform:translateY(1px);}
+
+  .progress-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:16px;
+    font-weight:700;
+    font-size:0.88rem;
+    color:var(--forest);
+  }
+  .progress-track{
+    flex:1;
+    height:10px;
+    background:var(--paper-dark);
+    border-radius:99px;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    background:linear-gradient(90deg, var(--leaf), var(--forest));
+    border-radius:99px;
+    transition:width .3s ease;
+    width:0%;
+  }
+
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  /* MAP TAB */
+  .map-card{
+    background:linear-gradient(180deg, #DCEBD2 0%, #F0EAD2 100%);
+    border-radius:22px;
+    padding:10px;
+    box-shadow:0 6px 0 rgba(47,82,51,0.12);
+    border:2px solid var(--paper-dark);
+    overflow:hidden;
+  }
+  svg{display:block; width:100%; height:auto;}
+
+  .legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px 16px;
+    justify-content:center;
+    margin-top:14px;
+    font-size:0.78rem;
+    font-weight:700;
+    color:#5B4F3C;
+  }
+  .legend span{display:inline-flex; align-items:center; gap:6px;}
+  .dot{width:11px; height:11px; border-radius:50%; display:inline-block;}
+  .dot-small{width:8px; height:8px; border-radius:50%; display:inline-block; border:2px dashed #E86A45; background:#fff;}
+
+  .pin-label{
+    font-family:'Nunito', sans-serif;
+    font-weight:800;
+    font-size:11px;
+    fill:var(--ink);
+  }
+  .alt-label{
+    font-family:'Nunito', sans-serif;
+    font-weight:700;
+    font-size:8.5px;
+    fill:#5B4F3C;
+  }
+  .pin-num{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:13px;
+    fill:var(--white);
+  }
+  .pin-group{cursor:pointer;}
+  .pin-group:hover .pin-circle{stroke-width:5;}
+  .check-badge{opacity:0; transition:opacity .2s ease;}
+  .pin-group.done .pin-circle{opacity:0.35;}
+  .pin-group.done .pin-emoji{opacity:0.35;}
+  .pin-group.done .check-badge{opacity:1;}
+
+  /* DETAIL TAB */
+  .stop-card{
+    background:var(--white);
+    border-radius:18px;
+    padding:16px 16px 14px;
+    margin-bottom:12px;
+    border-left:7px solid var(--grey);
+    box-shadow:0 4px 0 rgba(43,33,21,0.06);
+    transition:opacity .2s ease;
+  }
+  .stop-card.done{opacity:0.55;}
+  .stop-top{display:flex; align-items:flex-start; gap:10px; justify-content:space-between;}
+  .stop-title-row{display:flex; align-items:center; gap:8px;}
+  .stop-emoji{font-size:1.4rem;}
+  .stop-name{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:1.05rem;
+    color:var(--forest);
+    margin:0;
+  }
+  .stop-card.done .stop-name{text-decoration:line-through;}
+  .chip{
+    display:inline-block;
+    font-size:0.7rem;
+    font-weight:800;
+    padding:3px 10px;
+    border-radius:99px;
+    color:var(--white);
+    margin-top:4px;
+  }
+  .checkbox-btn{
+    flex-shrink:0;
+    width:30px; height:30px;
+    border-radius:9px;
+    border:2px solid var(--paper-dark);
+    background:var(--paper);
+    cursor:pointer;
+    font-size:1rem;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:background .15s ease, border-color .15s ease;
+  }
+  .checkbox-btn.checked{background:var(--leaf); border-color:var(--leaf); color:var(--white);}
+
+  .stop-meta{margin-top:10px; font-size:0.87rem; line-height:1.5;}
+  .stop-meta div{margin-bottom:3px;}
+  .stop-meta b{color:#5B4F3C;}
+  .stop-note{
+    margin-top:8px;
+    background:var(--paper);
+    border-radius:10px;
+    padding:8px 10px;
+    font-size:0.82rem;
+    color:#5B4F3C;
+    font-weight:600;
+  }
+  .alt-block{
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px dashed var(--paper-dark);
+  }
+  .alt-block-title{
+    font-size:0.75rem;
+    font-weight:800;
+    color:var(--coral);
+    margin-bottom:5px;
+  }
+  .alt-pill{
+    display:inline-block;
+    font-size:0.75rem;
+    font-weight:700;
+    background:var(--paper);
+    color:#5B4F3C;
+    padding:4px 10px;
+    border-radius:99px;
+    margin:0 5px 5px 0;
+    border:1.5px dashed var(--coral);
+  }
+
+  footer{
+    text-align:center;
+    margin-top:20px;
+    font-size:0.78rem;
+    color:#8A7C63;
+    font-weight:600;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🗺️ Perjalanan SNYP di Bogor</h1>
+    <p>Surken • Museum Zoologi • Makan Siang • Nicole's River Park • Megamendung</p>
+  </header>
+
+  <div class="progress-row">
+    <span id="progressLabel">0/6 selesai</span>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="map">🧭 Peta</button>
+    <button class="tab-btn" data-tab="detail">📋 Detail</button>
+  </div>
+
+  <div class="panel active" id="panel-map">
+    <div class="map-card">
+      <svg viewBox="0 0 800 560" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <g id="tree">
+            <ellipse cx="0" cy="3" rx="14" ry="5" fill="#000" opacity="0.07"/>
+            <rect x="-3" y="-10" width="6" height="15" rx="2" fill="#8A6A45"/>
+            <circle cx="0" cy="-21" r="16" fill="#6FA66C"/>
+            <circle cx="-9" cy="-13" r="11" fill="#7FB87C"/>
+            <circle cx="9" cy="-13" r="11" fill="#5C9159"/>
+          </g>
+          <g id="bush">
+            <ellipse cx="0" cy="0" rx="20" ry="8" fill="#000" opacity="0.06"/>
+            <circle cx="-10" cy="-6" r="12" fill="#7FB87C"/>
+            <circle cx="8" cy="-8" r="14" fill="#6FA66C"/>
+            <circle cx="0" cy="-2" r="11" fill="#8FC48B"/>
+          </g>
+          <g id="cloud">
+            <ellipse cx="0" cy="0" rx="24" ry="12" fill="#FFFDF7"/>
+            <circle cx="-14" cy="-4" r="12" fill="#FFFDF7"/>
+            <circle cx="12" cy="-6" r="14" fill="#FFFDF7"/>
+            <circle cx="0" cy="-10" r="11" fill="#FFFDF7"/>
+          </g>
+          <g id="hill">
+            <ellipse cx="0" cy="0" rx="75" ry="28" fill="#DCE9CE"/>
+          </g>
+          <g id="house">
+            <ellipse cx="0" cy="24" rx="22" ry="6" fill="#000" opacity="0.08"/>
+            <rect x="-18" y="-4" width="36" height="26" rx="2" fill="#F3E0C5"/>
+            <polygon points="-22,-4 0,-26 22,-4" fill="#E86A45"/>
+            <rect x="-5" y="8" width="10" height="14" fill="#8A6A45"/>
+            <rect x="-14" y="4" width="8" height="8" fill="#3E92CC" opacity="0.8"/>
+            <rect x="7" y="4" width="8" height="8" fill="#3E92CC" opacity="0.8"/>
+          </g>
+          <g id="house2">
+            <ellipse cx="0" cy="22" rx="20" ry="6" fill="#000" opacity="0.08"/>
+            <rect x="-16" y="-2" width="32" height="24" rx="2" fill="#EAD9BE"/>
+            <polygon points="-20,-2 0,-22 20,-2" fill="#7FA1A8"/>
+            <rect x="-5" y="9" width="10" height="13" fill="#8A6A45"/>
+            <rect x="-13" y="5" width="7" height="7" fill="#F3C15F" opacity="0.8"/>
+          </g>
+          <g id="pond">
+            <ellipse cx="0" cy="0" rx="52" ry="24" fill="#A8D3E0"/>
+            <ellipse cx="0" cy="0" rx="52" ry="24" fill="none" stroke="#7FB4C4" stroke-width="3"/>
+            <path d="M-18,-2 q6,-6 12,0 q6,6 12,0" stroke="#7FB4C4" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <path d="M-4,8 q6,-6 12,0" stroke="#7FB4C4" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          </g>
+          <g id="bird">
+            <path d="M-6,0 Q-3,-5 0,0 Q3,-5 6,0" stroke="#5B4F3C" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+          </g>
+          <g id="fencebit">
+            <rect x="-2" y="-14" width="4" height="16" fill="#C9BB98"/>
+            <rect x="10" y="-14" width="4" height="16" fill="#C9BB98"/>
+            <rect x="22" y="-14" width="4" height="16" fill="#C9BB98"/>
+            <rect x="-4" y="-9" width="32" height="3" fill="#C9BB98"/>
+          </g>
+        </defs>
+
+        <g class="scenery">
+          <use href="#hill" x="90" y="540"/>
+          <use href="#hill" x="330" y="540" opacity="0.7"/>
+          <use href="#hill" x="620" y="500" opacity="0.7"/>
+          <use href="#hill" x="130" y="330" opacity="0.55"/>
+          <use href="#hill" x="470" y="380" opacity="0.5"/>
+          <use href="#hill" x="640" y="240" opacity="0.55"/>
+          <use href="#hill" x="300" y="150" opacity="0.5"/>
+
+          <g transform="translate(730,55)">
+            <circle r="27" fill="#F3C15F"/>
+            <g stroke="#F3C15F" stroke-width="4" stroke-linecap="round">
+              <line x1="0" y1="-39" x2="0" y2="-47"/>
+              <line x1="28" y1="-28" x2="34" y2="-34"/>
+              <line x1="-28" y1="-28" x2="-34" y2="-34"/>
+              <line x1="39" y1="0" x2="47" y2="0"/>
+              <line x1="0" y1="39" x2="0" y2="47"/>
+            </g>
+          </g>
+
+          <use href="#cloud" x="110" y="50"/>
+          <use href="#cloud" x="430" y="35" transform="scale(0.8)"/>
+          <use href="#cloud" x="620" y="130" transform="scale(0.7)"/>
+          <use href="#bird" x="230" y="70"/>
+          <use href="#bird" x="255" y="60"/>
+          <use href="#bird" x="500" y="90"/>
+
+          <use href="#pond" x="660" y="470"/>
+          <use href="#bird" x="640" y="465"/>
+          <use href="#bird" x="670" y="475"/>
+
+          <use href="#house" x="120" y="235"/>
+          <use href="#house2" x="470" y="130"/>
+          <use href="#house" x="620" y="440"/>
+          <use href="#house2" x="90" y="440"/>
+
+          <use href="#fencebit" x="330" y="470"/>
+          <use href="#fencebit" x="360" y="470"/>
+
+          <use href="#tree" x="30" y="470"/>
+          <use href="#tree" x="180" y="500"/>
+          <use href="#tree" x="410" y="470"/>
+          <use href="#tree" x="480" y="500"/>
+          <use href="#bush" x="140" y="410"/>
+          <use href="#tree" x="60" y="330"/>
+          <use href="#bush" x="330" y="330"/>
+          <use href="#tree" x="440" y="340"/>
+          <use href="#tree" x="290" y="190"/>
+          <use href="#bush" x="440" y="170"/>
+          <use href="#tree" x="620" y="180"/>
+          <use href="#tree" x="700" y="260"/>
+          <use href="#bush" x="760" y="340"/>
+          <use href="#tree" x="600" y="420"/>
+          <use href="#bush" x="720" y="420"/>
+          <use href="#tree" x="250" y="80"/>
+          <use href="#tree" x="530" y="450"/>
+          <use href="#bush" x="30" y="240"/>
+        </g>
+
+        <path d="M70,500 C150,480 200,460 260,430 C220,400 150,330 180,280 C220,240 300,260 380,230 C450,210 520,260 560,340 C610,300 660,200 700,140"
+              fill="none" stroke="#8A7B5C" stroke-width="16" stroke-linecap="round"/>
+        <path d="M70,500 C150,480 200,460 260,430 C220,400 150,330 180,280 C220,240 300,260 380,230 C450,210 520,260 560,340 C610,300 660,200 700,140"
+              fill="none" stroke="#F6EFDC" stroke-width="3" stroke-linecap="round" stroke-dasharray="3 14"/>
+
+        <g id="alts"></g>
+        <g id="pins"></g>
+      </svg>
+    </div>
+    <div class="legend">
+      <span><i class="dot" style="background:#9B9284"></i>Perjalanan</span>
+      <span><i class="dot" style="background:#E86A45"></i>Kuliner</span>
+      <span><i class="dot" style="background:#6FA66C"></i>Wisata</span>
+      <span><i class="dot" style="background:#E8A33D"></i>Rekreasi</span>
+      <span><i class="dot" style="background:#3E92CC"></i>Penginapan</span>
+      <span><i class="dot-small"></i>Opsi alternatif</span>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-detail"></div>
+
+  <footer>Ketuk titik besar di peta atau kartu di detail untuk menandai tempat yang sudah dikunjungi. Titik kecil putus-putus di sekitar Surken adalah opsi alternatif jajanan. Tercentang tersimpan selama halaman ini masih terbuka.</footer>
+</div>
+
+<script>
+const CATEGORY_COLOR = {
+  transit: '#9B9284',
+  kuliner: '#E86A45',
+  wisata: '#6FA66C',
+  rekreasi: '#E8A33D',
+  penginapan: '#3E92CC'
+};
+const CATEGORY_LABEL = {
+  transit: 'Perjalanan',
+  kuliner: 'Kuliner',
+  wisata: 'Wisata & Edukasi',
+  rekreasi: 'Rekreasi',
+  penginapan: 'Penginapan'
+};
+
+const stops = [
+  {
+    id: 1, x: 70, y: 500, emoji: '🛵', name: 'Berangkat dari Palmerah',
+    category: 'transit', hours: '05:30 (disarankan)',
+    price: '—',
+    note: 'Motor tidak bisa lewat Tol Jagorawi — lewat Ciputat → Jl. Parung Raya → Jl. Pajajaran Bogor.',
+    done: false
+  },
+  {
+    id: 2, x: 260, y: 430, emoji: '🍢', name: 'Street Food Suryakencana (Surken)',
+    category: 'kuliner', hours: 'Umumnya 07:00–20:00, beda-beda tiap lapak',
+    price: 'Bayar per porsi, umumnya Rp10rb–30rb/item',
+    note: 'Sebagian lapak jual menu non-halal (babi) — cek dulu sebelum pesan. Parkir motor lalu jalan kaki, jalan sempit & ramai.',
+    alts: ['Cungkring Pak Endang', 'Laksa Aut "Mang Wahyu"', 'Soto Kuning Pak Yusup', 'Ngohiang Gang Aut', 'Sate Sumsum Pak OO'],
+    done: false
+  },
+  {
+    id: 3, x: 180, y: 280, emoji: '🐋', name: 'Museum Zoologi Bogoriense',
+    category: 'wisata', hours: 'Kebun Raya 08:00–16:00 (weekend buka 07:00)',
+    price: 'Tiket Kebun Raya Rp15.500 (weekday)/Rp25.500 (weekend) + Museum Rp15.000 (weekday)/Rp25.000 (weekend)',
+    note: 'Terletak di dalam Kebun Raya Bogor, jadi beli tiket kebun dulu baru masuk museum.',
+    done: false
+  },
+  {
+    id: 4, x: 380, y: 230, emoji: '🍛', name: 'Makan Siang: Ayam Bebek Kari Pedas Darmawangsa',
+    category: 'kuliner', hours: 'Buka 24 jam',
+    price: 'Harga kaki lima, kisaran Rp20rb–40rb/porsi',
+    note: 'Jl. DR. Sumeru No.68, Menteng, Bogor Barat — sekitar 3-5 km dari Surken, dekat saja.',
+    done: false
+  },
+  {
+    id: 5, x: 560, y: 340, emoji: '🏰', name: "Nicole's River Park",
+    category: 'rekreasi', hours: '08:00–17:00 (jam bisa lebih panjang saat weekend, cek dulu)',
+    price: 'Masuk Rp35rb (weekday)/Rp40rb (weekend). Paket + Castle mulai Rp65rb–165rb',
+    note: 'Ada mini zoo, wahana anak, dan banyak spot foto ala negeri dongeng. Cocok buat anak-anak.',
+    done: false
+  },
+  {
+    id: 6, x: 700, y: 140, emoji: '🏡', name: 'Penginapan di Megamendung',
+    category: 'penginapan', hours: 'Usahakan check-in sebelum 17:30',
+    price: '—',
+    note: 'Jalur Puncak mulai nanjak & berkelok, banyak truk/bus lambat — pelan-pelan aja.',
+    done: false
+  }
+];
+
+const alternatives = [
+  {name:'Cungkring Pak Endang', x:180, y:465},
+  {name:'Laksa Aut "Mang Wahyu"', x:330, y:465},
+  {name:'Soto Kuning Pak Yusup', x:205, y:385},
+  {name:'Ngohiang Gang Aut', x:315, y:390},
+  {name:'Sate Sumsum Pak OO', x:255, y:495}
+];
+
+function toggleStop(id){
+  const s = stops.find(s => s.id === id);
+  s.done = !s.done;
+  render();
+  saveState();
+}
+
+function saveState(){
+  const doneMap = {};
+  stops.forEach(s => { doneMap[s.id] = s.done; });
+  fetch('/api/state', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(doneMap)
+  }).catch(() => { /* offline / API belum tersambung, lanjut pakai state lokal */ });
+}
+
+async function loadState(){
+  try {
+    const res = await fetch('/api/state');
+    if(!res.ok) return;
+    const doneMap = await res.json();
+    if(!doneMap) return;
+    stops.forEach(s => { if(doneMap[s.id] !== undefined) s.done = doneMap[s.id]; });
+    render();
+  } catch(e) {
+    /* API belum ada / offline, tetap pakai state default */
+  }
+}
+
+function render(){
+  renderMap();
+  renderAlts();
+  renderDetail();
+  renderProgress();
+}
+
+function renderProgress(){
+  const done = stops.filter(s => s.done).length;
+  document.getElementById('progressLabel').textContent = `${done}/${stops.length} selesai`;
+  document.getElementById('progressFill').style.width = (done/stops.length*100) + '%';
+}
+
+function renderMap(){
+  const g = document.getElementById('pins');
+  g.innerHTML = '';
+  stops.forEach(s => {
+    const color = CATEGORY_COLOR[s.category];
+    const grp = document.createElementNS('http://www.w3.org/2000/svg','g');
+    grp.setAttribute('class', 'pin-group' + (s.done ? ' done' : ''));
+    grp.setAttribute('transform', `translate(${s.x},${s.y})`);
+    grp.addEventListener('click', () => toggleStop(s.id));
+
+    grp.innerHTML = `
+      <ellipse cx="0" cy="26" rx="20" ry="6" fill="#000" opacity="0.10"/>
+      <circle class="pin-circle" r="23" fill="${color}" stroke="#FFFDF7" stroke-width="4"/>
+      <text class="pin-emoji" text-anchor="middle" dy="8" font-size="21">${s.emoji}</text>
+      <circle class="pin-num-bg" cx="18" cy="-18" r="10" fill="#2B2115" stroke="#fff" stroke-width="2"/>
+      <text class="pin-num" x="18" y="-14" text-anchor="middle">${s.id}</text>
+      <g class="check-badge" transform="translate(18,18)">
+        <circle r="10" fill="#2F5233" stroke="#fff" stroke-width="2"/>
+        <text text-anchor="middle" dy="4" font-size="12" fill="#fff">✓</text>
+      </g>
+      <rect x="-40" y="30" width="80" height="16" rx="8" fill="#FFFDF7" opacity="0.92"/>
+      <text class="pin-label" text-anchor="middle" y="41">${s.name.length > 18 ? s.name.slice(0,16) + '…' : s.name}</text>
+    `;
+    g.appendChild(grp);
+  });
+}
+
+function renderAlts(){
+  const g = document.getElementById('alts');
+  g.innerHTML = '';
+  alternatives.forEach(a => {
+    const grp = document.createElementNS('http://www.w3.org/2000/svg','g');
+    grp.setAttribute('transform', `translate(${a.x},${a.y})`);
+    grp.innerHTML = `
+      <circle r="9" fill="#FFFDF7" stroke="#E86A45" stroke-width="2.4" stroke-dasharray="2.5 2.5"/>
+      <text text-anchor="middle" dy="4" font-size="10">🍥</text>
+      <rect x="-33" y="12" width="66" height="13" rx="6.5" fill="#FFFDF7" opacity="0.88"/>
+      <text class="alt-label" text-anchor="middle" y="21">${a.name.length > 16 ? a.name.slice(0,14) + '…' : a.name}</text>
+    `;
+    g.appendChild(grp);
+  });
+}
+
+function renderDetail(){
+  const panel = document.getElementById('panel-detail');
+  panel.innerHTML = '';
+  stops.forEach(s => {
+    const color = CATEGORY_COLOR[s.category];
+    const card = document.createElement('div');
+    card.className = 'stop-card' + (s.done ? ' done' : '');
+    card.style.borderLeftColor = color;
+    let altsHtml = '';
+    if(s.alts){
+      altsHtml = `<div class="alt-block"><div class="alt-block-title">🍥 Opsi alternatif di sekitar sini</div>${s.alts.map(a => `<span class="alt-pill">${a}</span>`).join('')}</div>`;
+    }
+    card.innerHTML = `
+      <div class="stop-top">
+        <div>
+          <div class="stop-title-row">
+            <span class="stop-emoji">${s.emoji}</span>
+            <p class="stop-name">${s.id}. ${s.name}</p>
+          </div>
+          <span class="chip" style="background:${color}">${CATEGORY_LABEL[s.category]}</span>
+        </div>
+        <button class="checkbox-btn ${s.done ? 'checked' : ''}" aria-label="Tandai selesai">${s.done ? '✓' : ''}</button>
+      </div>
+      <div class="stop-meta">
+        <div><b>Jam:</b> ${s.hours}</div>
+        <div><b>Harga:</b> ${s.price}</div>
+      </div>
+      <div class="stop-note">${s.note}</div>
+      ${altsHtml}
+    `;
+    card.querySelector('.checkbox-btn').addEventListener('click', () => toggleStop(s.id));
+    panel.appendChild(card);
+  });
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+render();
+loadState();
+</script>
+</body>
+</html>

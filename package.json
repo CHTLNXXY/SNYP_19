@@ -1,0 +1,9 @@
+{
+  "name": "perjalanan-snyp-bogor",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Checklist perjalanan interaktif untuk trip Bogor, dengan penyimpanan status via Vercel Serverless Function + Upstash Redis.",
+  "dependencies": {
+    "@upstash/redis": "^1.34.0"
+  }
+}
